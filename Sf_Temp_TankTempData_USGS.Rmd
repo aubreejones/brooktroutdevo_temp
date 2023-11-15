@@ -1,0 +1,46 @@
+---
+title: "TempData"
+output: html_document
+---
+
+```{r}
+library(ggplot2) #plots
+library(dplyr) #data wrangling#
+
+library(lattice)
+library(readxl)
+
+data <- read_excel("TempData.xlsx")
+
+#str(data$Date) #current format of Date is 1/21/14 and it's being read in as a character (chr) which isn't super helpful
+data$dateTime <- as.Date(data$dateTime, "%m/%d/%y %H%M%%S") #This changes the column to a Date format and in the quotes is the CURRENT format it's in so R knows how to "translate". Here's a table of the date formats: https://www.r-bloggers.com/2013/08/date-formats-in-r/ . So I used %m = two digit month abbrevation, %d = day of the month, %y = last two digits of year and each is separated by a / in the original excel/csv file
+str(data$dateTime) #Now when I look at the structure, it's coming up as a Date format and it's in "2014-01-21" format. This is a more widely recognized format for ggplot 
+```
+
+```{r}
+plot1 <- ggplot(data = data, aes(x = dateTime, color = as.factor(bank), y=temp)) + #I'm creating a figure called "plot1" and this sets what's what in the main plotting area. I had to add as.factor before Bank because otherwise it thinks its 2 - 4 on a continuous scale, not a discrete scale of two values. 
+  #geom_line(size = 1.5) + #geom_line adds a connecting line between points on the plot. Size is thickness of the line.
+  geom_point(size = 0.1) + #geom_point adds points to show the plotted data points, and size is the size of the points
+  #geom_jitter() + #This moves the points off each other 
+  #geom_smooth(method = "lm") + #add linear model
+  scale_x_date(date_labels = "%m", #This tells it I'm plotting dates across the x axis, and what format I want it to show across the x axis labels
+               date_breaks = "30 days") + 
+  scale_color_manual(name = "Bank",
+                     values = c("dodgerblue3", "#ffc425", "red1")) +
+  xlab("Month in 2020-2021") +
+  ylab(expression(paste('Temperature (',~degree,'C)',sep=''))) +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 11, vjust = 1, hjust = 0.5),
+        axis.text.y = element_text(color="black", size = 11),
+        legend.position = "none",
+        legend.title = element_text(size = 11),
+        legend.text = element_text(size = 11))
+  
+plot1 
+
+```
+
