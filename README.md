@@ -17,4 +17,4 @@ Sf_Temp_R_SEM_NeuromastSize.Rmd = R markdown file containing code for analysis o
 
 Sf_Temp_TankTempData_USGS.Rmd = R markdown file containing code to produce graph for daily temperature log data 
 
-Sf_Temp_NMCounts_DiASP.Rmd = R markdown file containing code for analysis of vital staining with 4-Di-2-ASp neuromast number data, works with Sf_NMCounts_DiASP_USGSTempStudy spreadsheet 
+Sf_Temp_NMCounts_DiASP.Rmd = R markdown file containing code for analysis of vital staining with 4-Di-2-ASP neuromast number data, works with Sf_NMCounts_DiASP_USGSTempStudy spreadsheet 
