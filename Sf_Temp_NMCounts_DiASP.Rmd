@@ -1,0 +1,194 @@
+---
+title: "Sf_Temp_NMCounts_DiASP"
+output: html_document
+---
+
+```{r}
+library(lattice)
+library(readxl)
+
+#Loaded Sheet 
+Data = read_excel("Sf_NMCounts_DiASP_USGSTempStudy.xlsx")
+summary(Data)
+
+library(ggplot2) #plots
+library(dplyr) #data wrangling#
+```
+
+```{r}
+Temp0 = subset(Data, Data$TREATMENT == "0")
+Temp2 = subset(Data, Data$TREATMENT == "2")
+Temp4 = subset(Data, Data$TREATMENT == "4")
+```
+
+```{r}
+###Break Point Estimates for CN Number vs. SL 
+fit_T4 <- lm(TOTAL_CN~SL, data=Temp4)
+segmented.fit_T4 <- segmented(fit_T4, seg.Z = ~SL, psi=25)
+summary(segmented.fit_T4)
+
+fit_T2 <- lm(TOTAL_CN~SL, data=Temp2)
+segmented.fit_T2 <- segmented(fit_T2, seg.Z = ~SL, psi=25)
+summary(segmented.fit_T2)
+
+fit_T0 <- lm(TOTAL_CN~SL, data=Temp0)
+segmented.fit_T0 <- segmented(fit_T0, seg.Z = ~SL, psi=25)
+summary(segmented.fit_T0)
+```
+
+```{r}
+##Linear models reported in results for increase in CN# before it stabilizes
+temp0 <- subset(Temp0, SL < 23)
+temp2 <- subset(Temp2, SL < 23.6)
+temp4 <- subset(Temp4, SL < 22.5)
+Data2 <- subset(Data, SL <23)
+
+lm0 = lm(data=temp0, formula = TOTAL_CN~SL)
+summary(lm0) 
+
+lm2 = lm(data=temp2, formula = TOTAL_CN~SL)
+summary(lm2)
+
+lm4 = lm(data=temp4, formula = TOTAL_CN~SL)
+summary(lm4)
+```
+
+```{r}
+###Reported ANCOVA values for canal neuromast number vs. fish size (mm SL)
+shapiro.test(Data2$TOTAL_CN)
+
+library(car)
+leveneTest(TOTAL_CN~as.factor(TREATMENT), data=Data2)
+leveneTest(TOTAL_CN~as.factor(SL), data=Data2)
+library(multcomp)
+
+ancova
+ancova2<- aov(TOTAL_CN ~ as.factor(TREATMENT) + SL, data = Data2)
+summary(ancova2)
+postHocs2 <- glht(ancova2, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
+summary(postHocs2)
+```
+
+```{r}
+##Reported ANCOVA values for superficial neuromasts number vs. fish size (mm SL)
+
+shapiro.test(Data$TOTAL_SN)
+
+library(car)
+leveneTest(TOTAL_SN~as.factor(TREATMENT), data=Data)
+leveneTest(TOTAL_SN~as.factor(SL), data=Data)
+library(multcomp)
+
+
+ancova3 <- aov(TOTAL_SN ~ as.factor(TREATMENT) + SL, data = Data)
+summary(ancova3)
+postHocs3 <- glht(ancova3, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
+summary(postHocs3)
+```
+
+```{r}
+#Fish Size vs. Age Plot of all specimens used for vital staining with 4-Di-2-ASP
+library(ggplot2)
+
+plot1 <- ggplot(data = Data, aes(x = AGE, color = as.factor(TREATMENT), y=SL)) + 
+  geom_smooth(method = "lm", se=FALSE) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter(width=0.2)+
+  scale_x_continuous(breaks = scales::pretty_breaks(n = 6))+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Age (dpf)") +
+  ylab("Fish Size (mm SL)") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position = c(0.1, 0.8),
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot1 
+```
+
+```{r}
+##Superficial neuromast number vs. fish size graphs 
+library(patchwork)
+
+plot2 <- ggplot(data = Data, aes(x =SL, color = as.factor(TREATMENT), y=TOTAL_SN)) +
+  geom_smooth(method="lm",se=FALSE) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter(width=0.2)+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1")) +
+  xlab("SL (mm)") +
+  ylab("SN Number") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.title.x = element_text(color = "black", size = 14),
+        axis.text.x = element_text(color="black", size = 11, angle = 35, vjust = 1, hjust = 1),
+        axis.title.y = element_text(color = "black", size = 14),
+        axis.text.y = element_text(color="black", size = 11),
+        legend.position="bottom",
+        legend.title = element_text(size = 11),
+        legend.text = element_text(size = 11),
+        strip.background = element_blank())
+
+plot2 +  facet_grid(~factor(TREATMENT, levels=c('4', '2', '0'))) + theme(panel.spacing = unit(2, "lines"))
+```
+
+```{r}
+##Canal neuromast number vs. fish size graphs
+library(patchwork)
+
+smallData <- subset(Data, Data$SL <22) ##For linear models on graph, based on break point analysis
+largeData <- subset(Data, Data$SL > 21.99) ##For linear models on graph, based on break point analysis 
+plot3 <- ggplot(data = Data, aes(x = SL, color = as.factor(TREATMENT), y=TOTAL_CN)) + 
+  geom_smooth(method="lm", data=smallData, se=FALSE) + #linear models for before approximate breakpoints
+  geom_smooth(method="lm", data = largeData, se=FALSE)+ #linear models for after approximate breakpoints 
+  geom_point() + 
+  geom_jitter(width=0.2)+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1")) +
+  xlab("SL (mm)") +
+  ylab("CN Number") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.title.x = element_text(color = "black", size = 14),
+        axis.text.x = element_text(color="black", size = 11, angle = 35, vjust = 1, hjust = 1),
+        axis.title.y = element_text(color = "black", size = 14),
+        axis.text.y = element_text(color="black", size = 11),
+        legend.position="bottom",
+        legend.title = element_text(size = 11),
+        legend.text = element_text(size = 11),
+        strip.background = element_blank())
+
+plot3 + facet_grid(~factor(TREATMENT, levels=c('4', '2', '0'))) + theme(panel.spacing = unit(2, "lines"))
+```
+
+```{r}
+##Analysis to test whether fish size vs. fish age varied among treatments 
+shapiro.test(Data$SL)
+
+library(car)
+leveneTest(SL~as.factor(TREATMENT), data=Data)
+leveneTest(SL~as.factor(AGE), data=Data)
+library(multcomp)
+
+
+ancova3 <- aov(SL ~ as.factor(TREATMENT) + AGE, data = Data)
+summary(ancova3)
+postHocs3 <- glht(ancova3, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
+summary(postHocs3)
+```
+
