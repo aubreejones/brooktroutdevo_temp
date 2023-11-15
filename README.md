@@ -1,7 +1,7 @@
 # brooktroutdevo
-Data and files relating to brook trout lateral line development project 
+Data and files relating to experiment in collaboration with USGS to examine development of the lateral line in brook trout under different temperature regimes relevant to climate change. 
 
-Spreadsheets and Code documents are in attached files.
+Spreadsheets and Code documents are in attached files. See descriptions below: 
 
 Spreadsheets: 
 Sf_NMCounts_DiASP_USGSTempStudy = Neuromast Count data derived from vital staining with 4-Di-2-ASP
