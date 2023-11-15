@@ -1,4 +1,4 @@
-# brooktroutdevo
+# brooktroutdevo_temp
 Data and files relating to experiment in collaboration with USGS to examine development of the lateral line in brook trout under different temperature regimes relevant to climate change. 
 
 Spreadsheets and Code documents are in attached files. See descriptions below: 
