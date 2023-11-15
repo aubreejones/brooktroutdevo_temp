@@ -1,0 +1,315 @@
+---
+title: "Sf_Temp_NeuromastSize_SEMData"
+output: html_document
+---
+
+```{r}
+library(lattice)
+library(readxl)
+
+#Loaded Sheet 
+data = read_excel("Sf_SEMMeasurements_forR.xlsx")
+summary(data)
+```
+
+```{r}
+MD <- subset(data, LINE =="MD")
+summary(MD)
+
+SO <- subset(data, LINE=="SO")
+summary(SO)
+
+DDSO <- subset(data, LINE=="DDSO")
+summary(DDSO)
+```
+
+```{r}
+MD_T0 <- subset(MD, TREATMENT =="0")
+#summary(MD_T0)
+
+MD_T2 <- subset(MD, TREATMENT =="2")
+#summary(MD_T2)
+
+MD_T4 <- subset(MD, TREATMENT =="4")
+#summary(MD_T4)
+```
+
+```{r}
+SO_T0 <- subset(SO, TREATMENT =="0")
+#summary(MD_T0)
+
+SO_T2 <- subset(SO, TREATMENT =="2")
+#summary(MD_T2)
+
+SO_T4 <- subset(SO, TREATMENT =="4")
+#summary(MD_T4)
+```
+
+```{r}
+largeMD <- subset(MD, LENGTH>18)
+justrightMD <- subset(largeMD, LENGTH<34)
+largeSO <- subset(SO, LENGTH>18)
+justrightSO <- subset(largeSO, LENGTH<29)
+#subsetting data for canal neuromasts based on when neuromasts were present in all three treatments, see Methods 
+```
+
+```{r}
+NM2b <- subset(data, NM_STAGE == "2b")
+#To measure size of neuromasts just prior to enclosure 
+
+mean(NM2b$NM_LENGTH)
+```
+
+```{r}
+shapiro.test(justrightSO$NM_LENGTH)
+shapiro.test(justrightMD$NM_LENGTH)
+```
+
+```{r}
+##PM canal neuromast size vs. fish size graph 
+library(ggplot2)
+plot1 <- ggplot(data = MD, aes(x = LENGTH, color = as.factor(TREATMENT), y=NM_LENGTH)) + 
+  #geom_line(size = 1.5) + #geom_line adds a connecting line between points on the plot. Size is thickness of the line.
+  geom_smooth(method = "lm", se = F) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter()+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Size (mm SL)") +
+  ylab("Neuromast length (um)") +
+  theme_bw() +
+  theme(axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position="bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot1 
+```
+
+```{r}
+##PM canal neuromast size vs. fish age 
+plot2 <- ggplot(data = MD, aes(x = AGE, color = as.factor(TREATMENT), y=NM_LENGTH)) + 
+  #geom_line(size = 1.5) + #geom_line adds a connecting line between points on the plot. Size is thickness of the line.
+  geom_smooth(method = "lm", se = FALSE) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter()+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Age (dpf)") +
+  ylab("Neuromast Length (um)") +
+  theme_bw() +
+  theme(axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position="bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot2 
+```
+
+```{r}
+##SO canal neuromast size vs. fish size 
+library(ggplot2)
+plot3 <- ggplot(data = SO, aes(x = LENGTH, color = as.factor(TREATMENT), y=NM_LENGTH)) + 
+  #geom_line(size = 1.5) + #geom_line adds a connecting line between points on the plot. Size is thickness of the line.
+  geom_smooth(method = "lm", se = F) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter()+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Size (mm SL)") +
+  ylab("Neuromast length (um)") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position="bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot3 
+```
+
+```{r}
+##SO canal neuromast size vs. fish age graph 
+plot4 <- ggplot(data = SO, aes(x = AGE, color = as.factor(TREATMENT), y=NM_LENGTH)) + 
+  geom_smooth(method = "lm", se =F) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter()+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Age (dpf)") +
+  ylab("Neuromast length (um)") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position="bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot4 
+```
+
+```{r}
+##adl superficial neuromast size vs. fish size graph 
+plot5 <- ggplot(data = DDSO, aes(x = LENGTH, color = as.factor(TREATMENT), y=NM_LENGTH)) + 
+  geom_smooth(method = "lm", se=F) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter()+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Size (mm SL)") +
+  ylab("Neuromast length (um)") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position="bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot5 
+```
+
+```{r}
+##adl superficial neuromast size vs. fish age graph 
+plot6 <- ggplot(data = DDSO, aes(x = AGE, color = as.factor(TREATMENT), y=NM_LENGTH)) + 
+  geom_smooth(method = "lm", se=F) +
+  geom_point() + #geom_point adds points to show the plotted data points, and size is the size of the points
+  geom_jitter()+
+  scale_color_manual(name = "Treatment",
+                     values = c("dodgerblue3", "#ffc425", "red1"))+
+  xlab("Fish Age (dpf)") +
+  ylab("Neuromast length (um)") +
+  theme_bw() +
+  theme(#text = element_text(family = "Times"),
+        axis.line = element_line(color = "black", size = 1),
+        axis.ticks = element_line(color="black", size = 1),
+        axis.ticks.length = unit(1, "mm"),
+        axis.text.x = element_text(color="black", size = 12, angle = 0, vjust = 1, hjust = 0.5),
+        axis.title.x = element_text(color= "black", size=14),
+        axis.text.y = element_text(color="black", size = 12),
+        axis.title.y = element_text(color= "black", size=14),
+        legend.position="bottom",
+        legend.title = element_text(size = 14),
+        legend.text = element_text(size = 14))
+  
+plot6 
+
+```
+
+```{r}
+#ANCOVA w/ Tukey Contrasts: SO-f canal neuromasts 
+library(car)
+leveneTest(NM_LENGTH~as.factor(TREATMENT), data=justrightMD) #p>0.05, no sig diff 
+library(multcomp)
+ancova1 <- aov(NM_LENGTH ~ as.factor(TREATMENT) + LENGTH, data = justrightSO)
+residuals1 <- residuals(ancova1)
+shapiro.test(residuals1) ##normal 
+summary(ancova1)
+postHocs1 <- glht(ancova1, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
+
+summary(postHocs1)
+```
+
+```{r}
+##ANCOVA w/ Tukey Contrasts: PM-d canal neuromasts 
+library(car)
+leveneTest(NM_LENGTH~as.factor(TREATMENT), data=justrightMD)#p >0.05, no sig difference
+library(multcomp)
+ancova3 <- aov(NM_LENGTH ~ as.factor(TREATMENT) + LENGTH, data = justrightMD)
+residuals3 <- residuals(ancova3)
+shapiro.test(residuals3) ##normal
+summary(ancova3)
+postHocs3 <- glht(ancova3, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
+summary(postHocs3)
+```
+
+```{r}
+##ANCOVA w/ Tukey Contrasts: adl superficial neuromasts 
+library(car)
+leveneTest(NM_LENGTH~as.factor(TREATMENT), data=DDSO) #p>0.05, no sig diff
+library(multcomp)
+ancova5 <- aov(NM_LENGTH ~ as.factor(TREATMENT) + as.factor(LENGTH), data = DDSO)
+residuals5 <- residuals(ancova5)
+shapiro.test(residuals5) ##normal
+summary(ancova5)
+postHocs5 <- glht(ancova5, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
+summary(postHocs5)
+```
+
+```{r}
+##Linear models for adl superfical neuromasts for each treatment (T0, T2, T4)
+fit_ddso_T0 <- lm(NM_LENGTH~LENGTH, data=ddsoT0)
+summary(fit_ddso_T0)
+
+fit_ddso_T2 <- lm(NM_LENGTH~LENGTH, data=ddsoT2)
+summary(fit_ddso_T2)
+
+fit_ddso_T4 <- lm(NM_LENGTH~LENGTH, data=ddsoT4)
+summary(fit_ddso_T4)
+```
+
+```{r}
+##Linear models for PM-d canal neuromasts for each treatment (0, 2, 4) prior to enclosure in the canals 
+small_MD_T0 = subset(smallMD, TREATMENT == "0")
+
+small_MD_T2 = subset(smallMD, TREATMENT == "2")
+
+small_MD_T4 = subset(smallMD, TREATMENT == "4")
+
+lm_smMDT0 <- lm(NM_LENGTH~LENGTH, data=small_MD_T0)
+summary(lm_smMDT0)
+
+lm_smMDT2 <- lm(NM_LENGTH~LENGTH, data=small_MD_T2)
+summary(lm_smMDT2)
+
+lm_smMDT4 <- lm(NM_LENGTH~LENGTH, data=small_MD_T4)
+summary(lm_smMDT4)
+```
+
+```{r}
+##Linear models for SO-f canal neuromats for each treatment (0, 2, 4) prior to enclosure in the canals 
+small_SO_T0 = subset(smallSO, TREATMENT == "0")
+
+small_SO_T2 = subset(smallSO, TREATMENT == "2")
+
+small_SO_T4 = subset(smallSO, TREATMENT == "4")
+
+lm_smSOT0 <- lm(NM_LENGTH~LENGTH, data=small_SO_T0)
+summary(lm_smSOT0)
+
+lm_smSOT2 <- lm(NM_LENGTH~LENGTH, data=small_SO_T2)
+summary(lm_smSOT2)
+
+lm_smSOT4 <- lm(NM_LENGTH~LENGTH, data=small_SO_T4)
+summary(lm_smSOT4)
+```
+
