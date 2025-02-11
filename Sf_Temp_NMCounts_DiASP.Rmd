@@ -188,6 +188,8 @@ library(multcomp)
 
 ancova3 <- aov(SL ~ as.factor(TREATMENT) + AGE, data = Data)
 summary(ancova3)
+residuals3 <- residuals(ancova3)
+shapiro.test(residuals3)
 postHocs3 <- glht(ancova3, linfct = mcp("as.factor(TREATMENT)" = "Tukey"))
 summary(postHocs3)
 ```
